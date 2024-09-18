@@ -1,0 +1,17 @@
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\bin\Debug\net8.0\AnalizadorLexico.exe
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\bin\Debug\net8.0\AnalizadorLexico.deps.json
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\bin\Debug\net8.0\AnalizadorLexico.runtimeconfig.json
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\bin\Debug\net8.0\AnalizadorLexico.dll
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\bin\Debug\net8.0\AnalizadorLexico.pdb
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.AssemblyInfoInputs.cache
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.AssemblyInfo.cs
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.csproj.CoreCompileInputs.cache
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.dll
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\refint\AnalizadorLexico.dll
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.pdb
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.genruntimeconfig.cache
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\ref\AnalizadorLexico.dll
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\bin\Debug\net8.0\ConsoleTables.dll
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.csproj.AssemblyReference.cache
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\Analizad.46841CA4.Up2Date
