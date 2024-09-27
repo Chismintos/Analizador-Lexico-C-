@@ -15,3 +15,4 @@ C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\ne
 C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\bin\Debug\net8.0\ConsoleTables.dll
 C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.csproj.AssemblyReference.cache
 C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\Analizad.46841CA4.Up2Date
+C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\obj\Debug\net8.0\AnalizadorLexico.sourcelink.json

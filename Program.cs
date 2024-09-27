@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
 
-// Clase que representa un Token con su tipo y valor
 public class Token
 {
     public string Tipo { get; set; }
@@ -17,7 +14,6 @@ public class Token
     
 }
 
-// Responsable de leer el código fuente y dividirlo en tokens
 public class Lexer
 {
     private string _codigo; // Variable que contiene el código fuente
@@ -393,21 +389,177 @@ public class Lexer
     }
 }
 
-// Clase principal del programa
-public class Program
+class NodoExpresion
 {
-    public static void Main(string[] args)
+    public string Valor { get; set; }
+    public NodoExpresion? Izquierda { get; set; }
+    public NodoExpresion? Derecha { get; set; }
+
+    public NodoExpresion(string valor)
     {
-        // Especificar directamente la ruta del archivo fuente aquí
-        string rutaArchivo = "test.txt";
-
-        // Crear una instancia del lexer con la ruta del archivo
-        Lexer lexer = new Lexer(rutaArchivo);
-
-        // Tokenizar el contenido del archivo
-        List<Token> tokens = lexer.Tokenizar();
-
-        // Imprimir la tabla de tokens
-        lexer.ImprimirTablaTokens(tokens);
+        Valor = valor;
+        Izquierda = null; // Inicialización explícita
+        Derecha = null;   // Inicialización explícita
     }
 }
+
+class AnalizadorSintactico
+{
+    private string[] tokens;
+    private int pos;
+    private string? tokenActual;
+
+    public AnalizadorSintactico(string[] tokens)
+    {
+        this.tokens = tokens;
+        this.pos = 0;
+        this.tokenActual = tokens.Length > 0 ? tokens[pos] : null; // Manejo de posible array vacío
+    }
+
+    private void Avanzar()
+    {
+        pos++;
+        tokenActual = pos < tokens.Length ? tokens[pos] : null;
+    }
+
+    private void Error(string mensaje)
+    {
+        throw new Exception("Error de sintaxis: " + mensaje);
+    }
+
+    public NodoExpresion Parsear()
+    {
+        return Expresion();
+    }
+
+    private NodoExpresion Expresion()
+    {
+        NodoExpresion nodo = Termino();
+
+        while (tokenActual == "+" || tokenActual == "-")
+        {
+            string operador = tokenActual;
+            Avanzar();
+            NodoExpresion nodoDerecho = Termino();
+            NodoExpresion nuevoNodo = new NodoExpresion(operador)
+            {
+                Izquierda = nodo,
+                Derecha = nodoDerecho
+            };
+
+            Console.WriteLine("Nueva expresion: ");
+            Console.WriteLine("       " + nodoDerecho.Valor);
+            Console.WriteLine("     /");
+            Console.WriteLine(operador);
+            Console.WriteLine("     \\");
+            Console.WriteLine("       " + nodo.Valor);
+
+            nodo = nuevoNodo;
+        }
+
+        return nodo;
+    }
+
+    private NodoExpresion Termino()
+    {
+        NodoExpresion nodo = Factor();
+
+        while (tokenActual == "*" || tokenActual == "/")
+        {
+            string operador = tokenActual;
+            Avanzar();
+            NodoExpresion nodoDerecho = Factor();
+            NodoExpresion nuevoNodo = new NodoExpresion(operador)
+            {
+                Izquierda = nodo,
+                Derecha = nodoDerecho
+            };
+
+            Console.WriteLine("Nuevo termino: ");
+            Console.WriteLine("       " + nodoDerecho.Valor);
+            Console.WriteLine("     /");
+            Console.WriteLine(operador);
+            Console.WriteLine("     \\");
+            Console.WriteLine("       " + nodo.Valor);
+            nodo = nuevoNodo;
+        }
+
+        return nodo;
+    }
+
+    private NodoExpresion Factor()
+    {
+        string token = tokenActual ?? throw new Exception("Token inesperado");
+
+        if (int.TryParse(token, out _))
+        {
+            Avanzar();
+            return new NodoExpresion(token);
+        }
+        else if (token == "(")
+        {
+            Avanzar();
+            NodoExpresion nodo = Expresion();
+            if (tokenActual == ")")
+            {
+                Avanzar();
+                return nodo;
+            }
+            else
+            {
+                Error("Se esperaba ')'");
+            }
+        }
+        else
+        {
+            Error("Token inesperado");
+        }
+
+        throw new Exception("Se alcanzó un estado inesperado"); // Para evitar advertencias de control de flujo
+    }
+
+    public static void ImprimirArbol(NodoExpresion nodo, int nivel = 0, int lado = 0)
+    {
+        if (nodo != null)
+        {
+            ImprimirArbol(nodo.Derecha, nivel + 1, 2);
+            Console.WriteLine(new string(' ', 4 * nivel) + nodo.Valor);
+            ImprimirArbol(nodo.Izquierda, nivel + 1, 1);
+        }
+    }
+
+    public static void Main()
+    {
+        string expresion = "3 + 5 * ( 10 - 2 ) / 4";
+        string[] tokens = expresion.Split(' '); // Tokenización básica
+
+        AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
+        Console.WriteLine("Tokens: " + string.Join(", ", tokens));
+
+        NodoExpresion arbol = parser.Parsear();
+
+        // Mostrar el árbol sintáctico
+        Console.WriteLine("Árbol Sintáctico:");
+        ImprimirArbol(arbol);
+    }
+}
+
+//Logica de lexer
+
+// public class Program
+// {
+//     public static void Main(string[] args)
+//     {
+//         // Especificar directamente la ruta del archivo fuente aquí
+//         string rutaArchivo = "test.txt";
+
+//         // Crear una instancia del lexer con la ruta del archivo
+//         Lexer lexer = new Lexer(rutaArchivo);
+
+//         // Tokenizar el contenido del archivo
+//         List<Token> tokens = lexer.Tokenizar();
+
+//         // Imprimir la tabla de tokens
+//         lexer.ImprimirTablaTokens(tokens);
+//     }
+// }
