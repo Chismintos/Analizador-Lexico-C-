@@ -185,22 +185,28 @@ class Program
 
     // Método principal (punto de entrada) para probar el parser.
     public static void Main()
-    {
+{
+    // Especificar directamente la ruta del archivo fuente aquí
+    string rutaArchivo = "test.txt";
 
-        // Expresión a evaluar.
-        string expresion = "3 + 5 * ( 10 - 2 ) / 4";
-        // Tokeniza la expresión separando por espacios.
-        string[] tokens = expresion.Split(' '); // Tokenización básica.
+    // Crear una instancia del lexer con la ruta del archivo
+    Lexer lexer = new Lexer(rutaArchivo);
 
-        // Crea una instancia del analizador sintáctico con los tokens.
-        AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
-        Console.WriteLine("Tokens: " + string.Join(", ", tokens)); // Imprime los tokens.
+    // Tokenizar el contenido del archivo
+    List<Token> listaTokens = lexer.Tokenizar();
 
-        // Llama al método de análisis y obtiene el árbol sintáctico.
-        NodoExpresion arbol = parser.Parsear();
+    // Convertir la lista de tokens a un arreglo de cadenas con solo los valores
+    string[] tokens = listaTokens.Select(token => token.Valor).ToArray();
 
-        // Muestra el árbol sintáctico en consola.
-        Console.WriteLine("Árbol Sintáctico:");
-        ImprimirArbol(arbol);
-    }
+    // Crea una instancia del analizador sintáctico con los tokens.
+    AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
+    Console.WriteLine("Tokens: " + string.Join(", ", tokens)); // Imprime los tokens.
+
+    // Llama al método de análisis y obtiene el árbol sintáctico.
+    NodoExpresion arbol = parser.Parsear();
+
+    // Muestra el árbol sintáctico en consola.
+    Console.WriteLine("Árbol Sintáctico:");
+    ImprimirArbol(arbol);
+}
 }
