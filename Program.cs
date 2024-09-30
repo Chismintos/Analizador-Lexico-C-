@@ -317,8 +317,8 @@ public class Lexer
     }
 
     // Lee símbolos (delimitadores y operadores)
-    private Token LeerSimbolo()
-{
+    private Token LeerSimbolo(){
+
     char actual = _codigo[_posicion];
     string valorSimbolo = actual.ToString();
     _posicion++;
@@ -331,9 +331,10 @@ public class Lexer
             return new Token("OP_RESTA", valorSimbolo); // Operador de resta
         case '*':
             return new Token("OP_MULTIPLICACION", valorSimbolo); // Operador de multiplicación
-        case '/':
-           
+        case '/':   
             return new Token("OP_DIVISION", valorSimbolo); // Operador de división
+        case '^':
+            return new Token("OP_POTENCIA", valorSimbolo); // Operador de potencia
         case '=':
             if (_posicion < _codigo.Length && _codigo[_posicion] == '=')
             {
