@@ -87,50 +87,37 @@ class AnalizadorSintactico
     throw new Exception("Se alcanzó un estado inesperado");
 }
 
-
-
-
-
-
-
-
 //Aqui comienza la logica de los operadores
-    private NodoExpresion Asignacion(){
-
-    // Procesa la variable (en este caso asumimos que solo puede ser un identificador).
-    string variable = tokenActual ?? throw new Exception("Token inesperado");
-
-    // Verifica que el token actual sea un identificador y no un número.
-    if (!EsIdentificador(variable))
-    {
-        Error("Se esperaba un identificador válido para la asignación");
-    }
-
-    Avanzar(); // Avanza al siguiente token.
+    private NodoExpresion Asignacion()
+{
+    // Primero procesamos el lado izquierdo: puede ser un identificador o un número.
+    NodoExpresion nodoIzquierda = Expresion(); // Cambié el nombre del nodo para reflejar mejor el flujo
 
     // Verifica si el siguiente token es un operador de asignación.
     if (tokenActual == "=")
     {
-        Avanzar(); // Avanza al siguiente token.
+        Avanzar(); // Avanzamos al siguiente token, que debería ser la expresión del lado derecho.
+
         // Procesa la expresión del lado derecho de la asignación.
         NodoExpresion nodoDerecho = Expresion();
 
-        // Crea un nodo para la asignación con la variable y la expresión.
+        // Crea un nodo de asignación donde el izquierdo es el identificador y el derecho es la expresión.
         NodoExpresion nodoAsignacion = new NodoExpresion("=")
         {
-            Izquierda = new NodoExpresion(variable), // Nodo para la variable.
-            Derecha = nodoDerecho // Nodo para la expresión.
+            Izquierda = nodoIzquierda, // El identificador o número en el lado izquierdo.
+            Derecha = nodoDerecho // La expresión en el lado derecho.
         };
 
         return nodoAsignacion; // Retorna el nodo de asignación.
     }
     else
     {
-        Error("Se esperaba '=' para la asignación"); // Manejo de error si no se encuentra '='.
+        // Si no es una asignación (no hay un '='), simplemente devolvemos el nodo izquierdo.
+        return nodoIzquierda;
     }
-
-    throw new Exception("Se alcanzó un estado inesperado");
 }
+
+
     // Método auxiliar para verificar si un token es un identificador válido.
 
     private HashSet<string> palabrasReservadas = new HashSet<string>
@@ -171,151 +158,113 @@ class AnalizadorSintactico
 }
     // Método que procesa una expresión (maneja las operaciones de suma y resta).
     private NodoExpresion Expresion()
+{
+    NodoExpresion nodo = Termino(); // Aquí ahora se procesa la multiplicación y división.
+
+    while (tokenActual == "+" || tokenActual == "-")
     {
-        // Comienza evaluando un término (multiplicación/división o un número).
-        NodoExpresion nodo = Termino();
-
-        // Mientras el token actual sea un operador de suma o resta.
-        while (tokenActual == "+" || tokenActual == "-")
+        string operador = tokenActual;
+        Avanzar();
+        NodoExpresion nodoDerecho = Termino();
+        NodoExpresion nuevoNodo = new NodoExpresion(operador)
         {
-            string operador = tokenActual; // Guarda el operador actual.
-            Avanzar(); // Avanza al siguiente token.
-
-            // Procesa el siguiente término (parte derecha de la expresión).
-            NodoExpresion nodoDerecho = Termino();
-
-            // Crea un nuevo nodo con el operador como valor, y conecta el nodo izquierdo y derecho.
-            NodoExpresion nuevoNodo = new NodoExpresion(operador)
-            {
-                Izquierda = nodo, // El nodo actual (izquierdo).
-                Derecha = nodoDerecho // El nuevo término (derecho).
-            };
-
-            // // Muestra en consola el árbol parcial construido.
-            // Console.WriteLine("Nueva expresion: ");
-            // Console.WriteLine("       " + nodoDerecho.Valor);
-            // Console.WriteLine("     /");
-            // Console.WriteLine(operador);
-            // Console.WriteLine("     \\");
-            // Console.WriteLine("       " + nodo.Valor);
-
-            // El nodo resultante se convierte en el nuevo nodo para continuar la construcción.
-            nodo = nuevoNodo;
-        }
-
-        return nodo; // Retorna el nodo raíz de la expresión procesada.
+            Izquierda = nodo,
+            Derecha = nodoDerecho
+        };
+        nodo = nuevoNodo;
     }
+
+    return nodo;
+}
 
     // Método que procesa un término (maneja multiplicación y división).
     private NodoExpresion Termino()
+{
+    NodoExpresion nodo = Potencia(); // Cambiado para que ahora procese la potencia antes.
+
+    while (tokenActual == "*" || tokenActual == "/")
     {
-        // Comienza evaluando una potencia (la operación con ^ tiene mayor precedencia).
-        NodoExpresion nodo = Potencia();
-
-        // Mientras el token actual sea un operador de multiplicación o división.
-        while (tokenActual == "*" || tokenActual == "/")
+        string operador = tokenActual;
+        Avanzar();
+        NodoExpresion nodoDerecho = Potencia(); // Usamos Potencia en lugar de Factor aquí.
+        NodoExpresion nuevoNodo = new NodoExpresion(operador)
         {
-            string operador = tokenActual; // Guarda el operador actual.
-            Avanzar(); // Avanza al siguiente token.
-
-            // Procesa el siguiente factor (parte derecha de la operación).
-            NodoExpresion nodoDerecho = Potencia(); // Cambiado de Factor a Potencia.
-
-            // Crea un nuevo nodo con el operador como valor y conecta los nodos izquierdo y derecho.
-            NodoExpresion nuevoNodo = new NodoExpresion(operador)
-            {
-                Izquierda = nodo, // Nodo izquierdo.
-                Derecha = nodoDerecho // Nodo derecho.
-            };
-
-            // // Muestra en consola el árbol parcial construido.
-            // Console.WriteLine("Nuevo termino: ");
-            // Console.WriteLine("       " + nodoDerecho.Valor);
-            // Console.WriteLine("     /");
-            // Console.WriteLine(operador);
-            // Console.WriteLine("     \\");
-            // Console.WriteLine("       " + nodo.Valor);
-
-            // El nuevo nodo se convierte en el nodo actual.
-            nodo = nuevoNodo;
-        }
-
-        return nodo; // Retorna el nodo raíz del término procesado.
+            Izquierda = nodo,
+            Derecha = nodoDerecho
+        };
+        nodo = nuevoNodo;
     }
 
+    return nodo;
+}
 
-    // Método que procesa un factor (número o expresión entre paréntesis).
+
+    
+    // Método que maneja los factores (números y expresiones entre paréntesis).
     private NodoExpresion Factor()
+{
+    if (tokenActual == "(") // Manejo de paréntesis
     {
-        string token = tokenActual ?? throw new Exception("Token inesperado"); // Verifica si el token es válido.
-
-        // Si el token actual es un número.
-        if (int.TryParse(token, out _))
-        {
-            Avanzar(); // Avanza al siguiente token.
-            return new NodoExpresion(token); // Crea y retorna un nodo con el número.
-        }
-        // Si el token actual es un paréntesis izquierdo.
-        else if (token == "(")
-        {
-            Avanzar(); // Avanza después del '('.
-            NodoExpresion nodo = Expresion(); // Procesa la expresión dentro de los paréntesis.
-            
-            // Verifica que haya un paréntesis derecho para cerrar la expresión.
-            if (tokenActual == ")")
-            {
-                Avanzar(); // Avanza después del ')'.
-                return nodo; // Retorna el nodo procesado dentro de los paréntesis.
-            }
-            else
-            {
-                Error("Se esperaba ')'"); // Si no hay ')', lanza un error de sintaxis.
-            }
-        }
-        else
-        {
-            Error("Token inesperado"); // Si el token no es un número o paréntesis, lanza un error.
-        }
-
-        throw new Exception("Se alcanzó un estado inesperado"); // Manejo de error genérico para evitar advertencias.
+        Avanzar(); // Avanzamos al siguiente token.
+        NodoExpresion expresionDentroDeParentesis = Expresion(); // Procesamos lo que está dentro de los paréntesis.
+        if (tokenActual != ")") Error("Se esperaba un paréntesis de cierre.");
+        Avanzar(); // Avanzamos al siguiente token después del paréntesis de cierre.
+        return expresionDentroDeParentesis;
     }
+    else if (int.TryParse(tokenActual, out int numero)) // Si el token actual es un número
+    {
+        NodoExpresion nodoNumero = new NodoExpresion(numero.ToString()); // Crea un nodo para el número.
+        Avanzar(); // Avanzamos al siguiente token.
+        return nodoNumero;
+    }
+    else if (EsIdentificador(tokenActual)) // Si el token actual es un identificador (como "num")
+    {
+        NodoExpresion nodoIdentificador = new NodoExpresion(tokenActual); // Crea un nodo para el identificador.
+        Avanzar(); // Avanzamos al siguiente token.
+        return nodoIdentificador;
+    }
+    else
+    {
+        Error("Token inesperado en el factor");
+        return null;
+    }
+}
 
     // Método que procesa una potencia (maneja el operador ^).
     private NodoExpresion Potencia()
+{
+    // Comienza evaluando un factor (un número o una expresión entre paréntesis).
+    NodoExpresion nodo = Factor();
+
+    // Mientras el token actual sea un operador de exponenciación (^).
+    while (tokenActual == "^")
     {
-        // Comienza evaluando un factor (un número o una expresión entre paréntesis).
-        NodoExpresion nodo = Factor();
+        string operador = tokenActual; // Guarda el operador actual.
+        Avanzar(); // Avanza al siguiente token.
 
-        // Mientras el token actual sea un operador de exponenciación (^).
-        while (tokenActual == "^")
+        // Procesa el siguiente factor (parte derecha de la operación).
+        NodoExpresion nodoDerecho = Factor();
+
+        // Crea un nuevo nodo con el operador como valor y conecta los nodos izquierdo y derecho.
+        NodoExpresion nuevoNodo = new NodoExpresion(operador)
         {
-            string operador = tokenActual; // Guarda el operador actual.
-            Avanzar(); // Avanza al siguiente token.
+            Izquierda = nodo, // Nodo izquierdo.
+            Derecha = nodoDerecho // Nodo derecho.
+        };
 
-            // Procesa el siguiente factor (parte derecha de la operación).
-            NodoExpresion nodoDerecho = Factor();
+        // // Muestra en consola el árbol parcial construido.
+        // Console.WriteLine("Nuevo potencia: ");
+        // Console.WriteLine("       " + nodoDerecho.Valor);
+        // Console.WriteLine("     /");
+        // Console.WriteLine(operador);
+        // Console.WriteLine("     \\");
 
-            // Crea un nuevo nodo con el operador como valor y conecta los nodos izquierdo y derecho.
-            NodoExpresion nuevoNodo = new NodoExpresion(operador)
-            {
-                Izquierda = nodo, // Nodo izquierdo.
-                Derecha = nodoDerecho // Nodo derecho.
-            };
-
-            // // Muestra en consola el árbol parcial construido.
-            // Console.WriteLine("Nuevo potencia: ");
-            // Console.WriteLine("       " + nodoDerecho.Valor);
-            // Console.WriteLine("     /");
-            // Console.WriteLine(operador);
-            // Console.WriteLine("     \\");
-            // Console.WriteLine("       " + nodo.Valor);
-
-            // El nuevo nodo se convierte en el nodo actual.
-            nodo = nuevoNodo;
-        }
-
-        return nodo; // Retorna el nodo raíz de la potencia procesada.
+        // El nuevo nodo se convierte en el nodo actual.
+        nodo = nuevoNodo;
     }
+
+    return nodo; // Retorna el nodo raíz de la potencia procesada.
+}
 
     public static void ImprimirArbol(NodoExpresion nodo, int nivel = 0, int lado = 0)
     {
@@ -332,4 +281,3 @@ class AnalizadorSintactico
 
 }
     // Método para imprimir el árbol sintáctico de manera jerárquica.
-

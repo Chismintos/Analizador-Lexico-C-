@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj": {}
+    "C:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj": {}
   },
   "projects": {
-    "c:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj": {
+    "C:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj",
+        "projectUniqueName": "C:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj",
         "projectName": "AnalizadorLexico",
-        "projectPath": "c:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj",
+        "projectPath": "C:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj",
         "packagesPath": "C:\\Users\\crist\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\obj\\",
+        "outputPath": "C:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\crist\\AppData\\Roaming\\NuGet\\NuGet.Config",
