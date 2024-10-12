@@ -1,6 +1,3 @@
-// PARTE DE ANALIZADOR SINTACTICO (PARSER)
-
-
 
 class NodoExpresion
 {
@@ -32,6 +29,12 @@ class AnalizadorSintactico
         this.pos = 0; // Comienza en la primera posición.
         // Si hay tokens, inicializa el token actual, de lo contrario lo deja en null.
         this.tokenActual = tokens.Length > 0 ? tokens[pos] : null; 
+
+         // Llama automáticamente a Parsear() cuando se cree el objeto
+        NodoExpresion arbol = Parsear();
+        
+        // Llama a ImprimirArbol después de generar el árbol
+        ImprimirArbol(arbol);
     }
 
     // Avanza al siguiente token en el array.
@@ -54,8 +57,7 @@ class AnalizadorSintactico
         return Asignacion(); // Comienza el análisis sintáctico desde el nivel de expresión.
     }
 
-    public NodoExpresion ExpresionCompleta()
-{
+    public NodoExpresion ExpresionCompleta(){
     // Procesa la parte izquierda de la expresión.
     NodoExpresion izquierda = Expresion();
 
@@ -86,8 +88,15 @@ class AnalizadorSintactico
 }
 
 
-    private NodoExpresion Asignacion()
-{
+
+
+
+
+
+
+//Aqui comienza la logica de los operadores
+    private NodoExpresion Asignacion(){
+
     // Procesa la variable (en este caso asumimos que solo puede ser un identificador).
     string variable = tokenActual ?? throw new Exception("Token inesperado");
 
@@ -182,13 +191,13 @@ class AnalizadorSintactico
                 Derecha = nodoDerecho // El nuevo término (derecho).
             };
 
-            // Muestra en consola el árbol parcial construido.
-            Console.WriteLine("Nueva expresion: ");
-            Console.WriteLine("       " + nodoDerecho.Valor);
-            Console.WriteLine("     /");
-            Console.WriteLine(operador);
-            Console.WriteLine("     \\");
-            Console.WriteLine("       " + nodo.Valor);
+            // // Muestra en consola el árbol parcial construido.
+            // Console.WriteLine("Nueva expresion: ");
+            // Console.WriteLine("       " + nodoDerecho.Valor);
+            // Console.WriteLine("     /");
+            // Console.WriteLine(operador);
+            // Console.WriteLine("     \\");
+            // Console.WriteLine("       " + nodo.Valor);
 
             // El nodo resultante se convierte en el nuevo nodo para continuar la construcción.
             nodo = nuevoNodo;
@@ -219,13 +228,13 @@ class AnalizadorSintactico
                 Derecha = nodoDerecho // Nodo derecho.
             };
 
-            // Muestra en consola el árbol parcial construido.
-            Console.WriteLine("Nuevo termino: ");
-            Console.WriteLine("       " + nodoDerecho.Valor);
-            Console.WriteLine("     /");
-            Console.WriteLine(operador);
-            Console.WriteLine("     \\");
-            Console.WriteLine("       " + nodo.Valor);
+            // // Muestra en consola el árbol parcial construido.
+            // Console.WriteLine("Nuevo termino: ");
+            // Console.WriteLine("       " + nodoDerecho.Valor);
+            // Console.WriteLine("     /");
+            // Console.WriteLine(operador);
+            // Console.WriteLine("     \\");
+            // Console.WriteLine("       " + nodo.Valor);
 
             // El nuevo nodo se convierte en el nodo actual.
             nodo = nuevoNodo;
@@ -293,13 +302,13 @@ class AnalizadorSintactico
                 Derecha = nodoDerecho // Nodo derecho.
             };
 
-            // Muestra en consola el árbol parcial construido.
-            Console.WriteLine("Nuevo potencia: ");
-            Console.WriteLine("       " + nodoDerecho.Valor);
-            Console.WriteLine("     /");
-            Console.WriteLine(operador);
-            Console.WriteLine("     \\");
-            Console.WriteLine("       " + nodo.Valor);
+            // // Muestra en consola el árbol parcial construido.
+            // Console.WriteLine("Nuevo potencia: ");
+            // Console.WriteLine("       " + nodoDerecho.Valor);
+            // Console.WriteLine("     /");
+            // Console.WriteLine(operador);
+            // Console.WriteLine("     \\");
+            // Console.WriteLine("       " + nodo.Valor);
 
             // El nuevo nodo se convierte en el nodo actual.
             nodo = nuevoNodo;
@@ -308,11 +317,6 @@ class AnalizadorSintactico
         return nodo; // Retorna el nodo raíz de la potencia procesada.
     }
 
-}
-    // Método para imprimir el árbol sintáctico de manera jerárquica.
-
-class Program
-{
     public static void ImprimirArbol(NodoExpresion nodo, int nivel = 0, int lado = 0)
     {
         if (nodo != null)
@@ -326,30 +330,6 @@ class Program
         }
     }
 
-    // Método principal (punto de entrada) para probar el parser.
-    public static void Main()
-{
-    // Especificar directamente la ruta del archivo fuente aquí
-    string rutaArchivo = "test.txt";
-
-    // Crear una instancia del lexer con la ruta del archivo
-    Lexer lexer = new Lexer(rutaArchivo);
-
-    // Tokenizar el contenido del archivo
-    List<Token> listaTokens = lexer.Tokenizar();
-
-    // Convertir la lista de tokens a un arreglo de cadenas con solo los valores
-    string[] tokens = listaTokens.Select(token => token.Valor).ToArray();
-
-    // Crea una instancia del analizador sintáctico con los tokens.
-    AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
-    Console.WriteLine("Tokens: " + string.Join(", ", tokens)); // Imprime los tokens.
-
-    // Llama al método de análisis y obtiene el árbol sintáctico.
-    NodoExpresion arbol = parser.Parsear();
-
-    // Muestra el árbol sintáctico en consola.
-    Console.WriteLine("Árbol Sintáctico:");
-    ImprimirArbol(arbol);
 }
-}
+    // Método para imprimir el árbol sintáctico de manera jerárquica.
+

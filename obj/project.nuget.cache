@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VSJbrQWCGEgu7g6DdUBAZsljqI7q2/P4p1EWw+yGmftERsNqk/gBLamxWC0VTiJ1R9CMQGYb5ue31MolEwwKkg==",
+  "dgSpecHash": "BgKoo99z1WWBlrCHAhmyfPZwcXdVRwnt6bpeNOVngePb5/sGUmEiDE0NoZNWQu6mJ8tlyucwJja5WsM/yo4tzw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\crist\\OneDrive\\Escritorio\\Analizdorlexico\\AnalizadorLexico\\AnalizadorLexico.csproj",
+  "projectFilePath": "c:\\Users\\crist\\OneDrive\\Escritorio\\AnalizadorSintactico\\Analizador-Lexico-C-\\AnalizadorLexico.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\crist\\.nuget\\packages\\consoletables\\2.4.2\\consoletables.2.4.2.nupkg.sha512",
     "C:\\Users\\crist\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",

@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = AnalizadorLexico
-build_property.ProjectDir = C:\Users\crist\OneDrive\Escritorio\Analizdorlexico\AnalizadorLexico\
+build_property.ProjectDir = c:\Users\crist\OneDrive\Escritorio\AnalizadorSintactico\Analizador-Lexico-C-\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
