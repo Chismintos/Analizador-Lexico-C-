@@ -355,6 +355,29 @@ public class Lexer
                 return new Token("OP_MAYOR_O_IGUAL", ">="); // Operador mayor o igual
             }
             return new Token("OP_MAYOR_QUE", valorSimbolo); // Operador mayor que
+        case '!':
+            if (_posicion < _codigo.Length && _codigo[_posicion] == '=')
+            {
+                _posicion++; // Avanzar para incluir el '='
+                return new Token("OP_DIFERENTE", "!="); // Operador diferente
+            }
+            // Si solo encontramos un '!', podríamos manejarlo como un error léxico.
+            throw new Exception($"Error léxico: El símbolo '{actual}' no es válido en esta posición.");
+        case '&':
+            if (_posicion < _codigo.Length && _codigo[_posicion] == '&')
+            {
+                _posicion++; // Avanzar para incluir el segundo '&'
+                return new Token("OP_AND", "&&"); // Operador AND lógico
+            }
+            return new Token("AMPERSAND", valorSimbolo);
+        case '|':
+            if (_posicion < _codigo.Length && _codigo[_posicion] == '|')
+            {
+                _posicion++; // Avanzar para incluir el segundo '|'
+                return new Token("OP_OR", "||"); // Operador OR lógico
+            }
+            // Si no es el operador lógico, podemos manejarlo como error o simplemente ignorarlo.
+            throw new Exception($"Error léxico: El símbolo '{actual}' no es válido en esta posición.");
         case ';':
             return new Token("PUNTO_Y_COMA", valorSimbolo); // Punto y coma
         case ',':
