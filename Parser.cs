@@ -24,165 +24,162 @@ public class AnalizadorSintactico
     }
 
     public NodoExpresion? Analizar()
-{
-    // Si comienza con 'while', analizamos la estructura del while
-    if (_indice < _tokens.Length && _tokens[_indice] == "while")
     {
-        return AnalizarWhile();
-    }
-
-    // Si comienza con 'if', analizamos la estructura condicional
-    if (_indice < _tokens.Length && _tokens[_indice] == "if")
-    {
-        return AnalizarIfElse();
-    }
-
-    // Si encontramos un '=', analizamos la asignación
-    if (_indice < _tokens.Length && _tokens.Contains("="))
-    {
-        return AnalizarAsignacion();
-    }
-
-    // Si no es una asignación ni un if, lo tratamos como una expresión
-    return AnalizarExpresion();
-}
-
-    // Método para analizar una estructura de if-else
-private NodoExpresion? AnalizarIfElse()
-{
-    if (_indice < _tokens.Length && _tokens[_indice] == "if")
-    {
-        _indice++;
-        if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'if'.");
-        _indice++;
-        NodoExpresion condicion = AnalizarExpresion(); // Condición del if
-        if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')'.");
-
-        _indice++;
-        NodoExpresion bloqueIf = AnalizarBloque();  // Bloque del if
-
-        NodoExpresion nodoIf = new NodoExpresion("if")
+        if (_indice < _tokens.Length && _tokens[_indice] == "while")
         {
-            Izquierda = condicion,
-            Derecha = bloqueIf
-        };
+            return AnalizarWhile();
+        }
 
-        if (_indice < _tokens.Length && _tokens[_indice] == "else")
+        if (_indice < _tokens.Length && _tokens[_indice] == "if")
+        {
+            return AnalizarIfElse();
+        }
+
+        if (_indice < _tokens.Length && _tokens.Contains("="))
+        {
+            return AnalizarAsignacion();
+        }
+
+        return AnalizarExpresion();
+    }
+
+    private NodoExpresion? AnalizarIfElse()
+    {
+        if (_indice < _tokens.Length && _tokens[_indice] == "if")
         {
             _indice++;
-            NodoExpresion bloqueElse = AnalizarBloque();  // Bloque del else
-            NodoExpresion nodoElse = new NodoExpresion("else")
+            if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'if'.");
+            _indice++;
+            NodoExpresion condicion = AnalizarExpresion();
+            if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')'.");
+            _indice++;
+            NodoExpresion bloqueIf = AnalizarBloque();
+
+            NodoExpresion nodoIf = new NodoExpresion("if")
             {
-                Izquierda = bloqueIf,
-                Derecha = bloqueElse
+                Izquierda = condicion,
+                Derecha = bloqueIf
             };
 
-            nodoIf.Derecha = nodoElse;
+            if (_indice < _tokens.Length && _tokens[_indice] == "else")
+            {
+                _indice++;
+                NodoExpresion bloqueElse = AnalizarBloque();
+                NodoExpresion nodoElse = new NodoExpresion("else")
+                {
+                    Izquierda = bloqueIf,
+                    Derecha = bloqueElse
+                };
+                nodoIf.Derecha = nodoElse;
+            }
+
+            return nodoIf;
         }
 
-        return nodoIf;
+        return null;
     }
 
-    return null;
-}
-
-private NodoExpresion? AnalizarWhile()
-{
-    if (_indice < _tokens.Length && _tokens[_indice] == "while")
+    private NodoExpresion? AnalizarWhile()
     {
-        _indice++;  // Saltamos el 'while'
-        if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'while'.");
+        if (_indice < _tokens.Length && _tokens[_indice] == "while")
+        {
+            _indice++;
+            if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'while'.");
+            _indice++;
+            NodoExpresion condicion = AnalizarExpresion();
+            if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')'.");
+            _indice++;
+            NodoExpresion bloqueWhile = AnalizarBloque();
+
+            NodoExpresion nodoWhile = new NodoExpresion("while")
+            {
+                Izquierda = condicion,
+                Derecha = bloqueWhile
+            };
+
+            return nodoWhile;
+        }
+
+        return null;
+    }
+
+    // Actualización del método para analizar bloques de instrucciones
+    private NodoExpresion AnalizarBloque()
+    {
+        if (_tokens[_indice] != "{") throw new Exception("Se esperaba '{'.");
         _indice++;
-        
-        NodoExpresion condicion = AnalizarExpresion(); // Condición del while
-        
-        if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')'.");
-        _indice++;  // Consumir el ')'
-        
-        NodoExpresion bloqueWhile = AnalizarBloque();  // Cuerpo del while
 
-        NodoExpresion nodoWhile = new NodoExpresion("while")
+        NodoExpresion? instrucciones = null;
+        NodoExpresion? ultimaInstruccion = null;
+
+        while (_indice < _tokens.Length && _tokens[_indice] != "}")
         {
-            Izquierda = condicion,  // La condición del while
-            Derecha = bloqueWhile   // El bloque de instrucciones del while
-        };
+            // Analizar una instrucción individual
+            NodoExpresion instruccion = Analizar(); 
 
-        return nodoWhile;
-    }
-    
-    return null;  // Si no es un 'while', regresamos null
-}
+            // Comprobar si es el final de la instrucción (indicado por ';')
+            if (_indice < _tokens.Length && _tokens[_indice] == ";")
+            {
+                _indice++;  // Consumir el punto y coma
+            }
 
-    // Método para analizar bloques de código, por ejemplo, el cuerpo de un if o else
-private NodoExpresion AnalizarBloque()
-{
-    if (_tokens[_indice] != "{") throw new Exception("Se esperaba '{'.");
-    _indice++;
-
-    NodoExpresion? instrucciones = null;
-    NodoExpresion? ultimaInstruccion = null;
-    
-    while (_indice < _tokens.Length && _tokens[_indice] != "}")
-    {
-        NodoExpresion instruccion = Analizar(); // Analizar cualquier instrucción dentro del bloque
-        if (instrucciones == null)
-        {
-            instrucciones = instruccion; // La primera instrucción
+            // Encadenar las instrucciones
+            if (instrucciones == null)
+            {
+                instrucciones = instruccion;  // Primera instrucción
+            }
+            else
+            {
+                ultimaInstruccion.Derecha = instruccion;  // Encadenar la última instrucción
+            }
+            ultimaInstruccion = instruccion;  // Guardar la última instrucción
         }
-        else
-        {
-            ultimaInstruccion.Derecha = instruccion;  // Encadenar las instrucciones
-        }
-        ultimaInstruccion = instruccion; // Guardar la última instrucción
+
+        _indice++;  // Consumir '}'
+
+        return instrucciones;
     }
-    _indice++; // Consumir el '}'
-    
-    return instrucciones;  // Retornar el bloque de instrucciones
-}
 
-
-
-    // Método para analizar expresiones aritméticas y lógicas
-    // Método para analizar expresiones aritméticas y lógicas
-private NodoExpresion AnalizarExpresion()
-{
-    NodoExpresion izquierda = AnalizarComparacion(); // Empezamos con comparaciones
-    return AnalizarLogicos(izquierda);  // Luego manejamos los operadores lógicos
-}
-
-
-private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
-{
-    while (_indice < _tokens.Length && (_tokens[_indice] == "&&" || _tokens[_indice] == "||"))
+    private NodoExpresion AnalizarExpresion()
     {
-        string operador = _tokens[_indice];
-        _indice++;
-        NodoExpresion derecha = AnalizarComparacion();  // Los operadores lógicos usan comparaciones
-        NodoExpresion nodoLogico = new NodoExpresion(operador);
-        nodoLogico.Izquierda = izquierda;
-        nodoLogico.Derecha = derecha;
-        izquierda = nodoLogico;  // Continuamos con el nodo lógico actualizado
+        NodoExpresion izquierda = AnalizarComparacion();
+        return AnalizarLogicos(izquierda);
     }
-    return izquierda;
-}
 
-    // Analiza una asignación como "a = 5"
+    private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
+    {
+        while (_indice < _tokens.Length && (_tokens[_indice] == "&&" || _tokens[_indice] == "||"))
+        {
+            string operador = _tokens[_indice];
+            _indice++;
+            NodoExpresion derecha = AnalizarComparacion();
+            NodoExpresion nodoLogico = new NodoExpresion(operador)
+            {
+                Izquierda = izquierda,
+                Derecha = derecha
+            };
+            izquierda = nodoLogico;
+        }
+        return izquierda;
+    }
+
     private NodoExpresion AnalizarAsignacion()
-{
-    NodoExpresion izquierda = AnalizarComparacion();  // Puede ser una variable a la izquierda
-    if (_indice < _tokens.Length && _tokens[_indice] == "=")
     {
-        _indice++;
-        NodoExpresion derecha = AnalizarExpresion();  // Se analiza una expresión a la derecha
-        NodoExpresion nodoAsignacion = new NodoExpresion("=");
-        nodoAsignacion.Izquierda = izquierda;
-        nodoAsignacion.Derecha = derecha;
-        return nodoAsignacion;
+        NodoExpresion izquierda = AnalizarComparacion();
+        if (_indice < _tokens.Length && _tokens[_indice] == "=")
+        {
+            _indice++;
+            NodoExpresion derecha = AnalizarExpresion();
+            NodoExpresion nodoAsignacion = new NodoExpresion("=")
+            {
+                Izquierda = izquierda,
+                Derecha = derecha
+            };
+            return nodoAsignacion;
+        }
+        return izquierda;
     }
-    return izquierda;
-}
 
-    // Analiza expresiones de comparación (>, <, >=, <=, ==, !=)
     private NodoExpresion AnalizarComparacion()
     {
         NodoExpresion izquierda = AnalizarSumaResta();
@@ -191,15 +188,16 @@ private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
             string operador = _tokens[_indice];
             _indice++;
             NodoExpresion derecha = AnalizarSumaResta();
-            NodoExpresion nodoComparacion = new NodoExpresion(operador);
-            nodoComparacion.Izquierda = izquierda;
-            nodoComparacion.Derecha = derecha;
+            NodoExpresion nodoComparacion = new NodoExpresion(operador)
+            {
+                Izquierda = izquierda,
+                Derecha = derecha
+            };
             izquierda = nodoComparacion;
         }
         return izquierda;
     }
 
-    // Analiza suma y resta
     private NodoExpresion AnalizarSumaResta()
     {
         NodoExpresion izquierda = AnalizarMultiplicacionDivision();
@@ -208,15 +206,16 @@ private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
             string operador = _tokens[_indice];
             _indice++;
             NodoExpresion derecha = AnalizarMultiplicacionDivision();
-            NodoExpresion nodoSumaResta = new NodoExpresion(operador);
-            nodoSumaResta.Izquierda = izquierda;
-            nodoSumaResta.Derecha = derecha;
+            NodoExpresion nodoSumaResta = new NodoExpresion(operador)
+            {
+                Izquierda = izquierda,
+                Derecha = derecha
+            };
             izquierda = nodoSumaResta;
         }
         return izquierda;
     }
 
-    // Analiza multiplicación y división
     private NodoExpresion AnalizarMultiplicacionDivision()
     {
         NodoExpresion izquierda = AnalizarPotencia();
@@ -225,15 +224,16 @@ private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
             string operador = _tokens[_indice];
             _indice++;
             NodoExpresion derecha = AnalizarPotencia();
-            NodoExpresion nodoMultiplicacionDivision = new NodoExpresion(operador);
-            nodoMultiplicacionDivision.Izquierda = izquierda;
-            nodoMultiplicacionDivision.Derecha = derecha;
+            NodoExpresion nodoMultiplicacionDivision = new NodoExpresion(operador)
+            {
+                Izquierda = izquierda,
+                Derecha = derecha
+            };
             izquierda = nodoMultiplicacionDivision;
         }
         return izquierda;
     }
 
-    // Analiza la operación de potencia
     private NodoExpresion AnalizarPotencia()
     {
         NodoExpresion izquierda = AnalizarFactor();
@@ -242,15 +242,16 @@ private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
             string operador = _tokens[_indice];
             _indice++;
             NodoExpresion derecha = AnalizarFactor();
-            NodoExpresion nodoPotencia = new NodoExpresion(operador);
-            nodoPotencia.Izquierda = izquierda;
-            nodoPotencia.Derecha = derecha;
+            NodoExpresion nodoPotencia = new NodoExpresion(operador)
+            {
+                Izquierda = izquierda,
+                Derecha = derecha
+            };
             izquierda = nodoPotencia;
         }
         return izquierda;
     }
 
-    // Analiza factores (números, variables, o expresiones entre paréntesis)
     private NodoExpresion AnalizarFactor()
     {
         if (_tokens[_indice] == "(")
@@ -269,13 +270,11 @@ private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
         }
     }
 
-    // Método para imprimir el árbol sintáctico de manera recursiva.
     public static void ImprimirArbol(NodoExpresion nodo, string indentacion = "", bool esUltimo = true)
     {
         if (nodo == null)
             return;
 
-        // Imprimir la indentación y si es el último nodo o no
         Console.Write(indentacion);
 
         if (esUltimo)
@@ -289,17 +288,9 @@ private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
             indentacion += "| ";
         }
 
-        // Imprimir el valor del nodo actual
         Console.WriteLine(nodo.Valor);
 
-        // Recursivamente imprimir los nodos hijos
-        var tieneHijoIzquierdo = nodo.Izquierda != null;
-        var tieneHijoDerecho = nodo.Derecha != null;
-
-        if (tieneHijoIzquierdo)
-            ImprimirArbol(nodo.Izquierda, indentacion, !tieneHijoDerecho);
-
-        if (tieneHijoDerecho)
-            ImprimirArbol(nodo.Derecha, indentacion, true);
+        ImprimirArbol(nodo.Izquierda, indentacion, false);
+        ImprimirArbol(nodo.Derecha, indentacion, true);
     }
 }
