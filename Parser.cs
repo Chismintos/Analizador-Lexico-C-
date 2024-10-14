@@ -24,78 +24,134 @@ public class AnalizadorSintactico
     }
 
     public NodoExpresion? Analizar()
+{
+    // Si comienza con 'if', analizamos la estructura condicional
+    if (_indice < _tokens.Length && _tokens[_indice] == "if")
     {
-        return AnalizarIfElse() ?? AnalizarExpresion();
+        return AnalizarIfElse();
     }
 
-    // Método para analizar una estructura de if-else
-    private NodoExpresion? AnalizarIfElse()
-    {
-        if (_indice < _tokens.Length && _tokens[_indice] == "if")
-        {
-            _indice++;
-            if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'if'.");
-            _indice++;
-            NodoExpresion condicion = AnalizarExpresion();
-            if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')'.");
-            _indice++;
-            NodoExpresion bloqueIf = AnalizarBloque();
-            
-            NodoExpresion? bloqueElse = null;
-            if (_indice < _tokens.Length && _tokens[_indice] == "else")
-            {
-                _indice++;
-                bloqueElse = AnalizarBloque();
-            }
-
-            NodoExpresion nodoIfElse = new NodoExpresion("if");
-            nodoIfElse.Izquierda = condicion;
-            nodoIfElse.Derecha = new NodoExpresion("else")
-            {
-                Izquierda = bloqueIf,
-                Derecha = bloqueElse
-            };
-            return nodoIfElse;
-        }
-
-        return null;
-    }
-
-    // Método para analizar bloques de código, por ejemplo, el cuerpo de un if o else
-    private NodoExpresion AnalizarBloque()
-    {
-        if (_tokens[_indice] != "{") throw new Exception("Se esperaba '{'.");
-        _indice++;
-        NodoExpresion bloque = new NodoExpresion("bloque");
-        while (_tokens[_indice] != "}")
-        {
-            bloque.Izquierda = AnalizarExpresion(); // Analizar una instrucción dentro del bloque
-        }
-        _indice++; // Consumir '}'
-        return bloque;
-    }
-
-    // Método para analizar expresiones aritméticas y lógicas
-    private NodoExpresion AnalizarExpresion()
+    // Si encontramos un '=', analizamos la asignación
+    if (_indice < _tokens.Length && _tokens.Contains("="))
     {
         return AnalizarAsignacion();
     }
 
-    // Analiza una asignación como "a = 5"
-    private NodoExpresion AnalizarAsignacion()
+    // Si no es una asignación ni un if, lo tratamos como una expresión
+    return AnalizarExpresion();
+}
+
+
+    // Método para analizar una estructura de if-else
+    // Método para analizar una estructura de if-else
+private NodoExpresion? AnalizarIfElse()
+{
+    if (_indice < _tokens.Length && _tokens[_indice] == "if")
     {
-        NodoExpresion izquierda = AnalizarComparacion();
-        if (_indice < _tokens.Length && _tokens[_indice] == "=")
+        _indice++;
+        if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'if'.");
+        _indice++;
+        NodoExpresion condicion = AnalizarExpresion(); // Condición del if
+        if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')'.");
+
+        _indice++;
+        NodoExpresion bloqueIf = AnalizarBloque();  // Bloque del if
+
+        NodoExpresion nodoIf = new NodoExpresion("if")
+        {
+            Izquierda = condicion,
+            Derecha = bloqueIf
+        };
+
+        if (_indice < _tokens.Length && _tokens[_indice] == "else")
         {
             _indice++;
-            NodoExpresion derecha = AnalizarAsignacion();
-            NodoExpresion nodoAsignacion = new NodoExpresion("=");
-            nodoAsignacion.Izquierda = izquierda;
-            nodoAsignacion.Derecha = derecha;
-            return nodoAsignacion;
+            NodoExpresion bloqueElse = AnalizarBloque();  // Bloque del else
+            NodoExpresion nodoElse = new NodoExpresion("else")
+            {
+                Izquierda = bloqueIf,
+                Derecha = bloqueElse
+            };
+
+            nodoIf.Derecha = nodoElse;
         }
-        return izquierda;
+
+        return nodoIf;
     }
+
+    return null;
+}
+
+
+
+    // Método para analizar bloques de código, por ejemplo, el cuerpo de un if o else
+private NodoExpresion AnalizarBloque()
+{
+    if (_tokens[_indice] != "{") throw new Exception("Se esperaba '{'.");
+    _indice++;
+
+    NodoExpresion? instrucciones = null;
+    NodoExpresion? ultimaInstruccion = null;
+    
+    while (_indice < _tokens.Length && _tokens[_indice] != "}")
+    {
+        NodoExpresion instruccion = Analizar(); // Analizar cualquier instrucción dentro del bloque
+        if (instrucciones == null)
+        {
+            instrucciones = instruccion; // La primera instrucción
+        }
+        else
+        {
+            ultimaInstruccion.Derecha = instruccion;  // Encadenar las instrucciones
+        }
+        ultimaInstruccion = instruccion; // Guardar la última instrucción
+    }
+    _indice++; // Consumir el '}'
+    
+    return instrucciones;  // Retornar el bloque de instrucciones
+}
+
+
+
+    // Método para analizar expresiones aritméticas y lógicas
+    // Método para analizar expresiones aritméticas y lógicas
+private NodoExpresion AnalizarExpresion()
+{
+    NodoExpresion izquierda = AnalizarComparacion(); // Empezamos con comparaciones
+    return AnalizarLogicos(izquierda);  // Luego manejamos los operadores lógicos
+}
+
+
+private NodoExpresion AnalizarLogicos(NodoExpresion izquierda)
+{
+    while (_indice < _tokens.Length && (_tokens[_indice] == "&&" || _tokens[_indice] == "||"))
+    {
+        string operador = _tokens[_indice];
+        _indice++;
+        NodoExpresion derecha = AnalizarComparacion();  // Los operadores lógicos usan comparaciones
+        NodoExpresion nodoLogico = new NodoExpresion(operador);
+        nodoLogico.Izquierda = izquierda;
+        nodoLogico.Derecha = derecha;
+        izquierda = nodoLogico;  // Continuamos con el nodo lógico actualizado
+    }
+    return izquierda;
+}
+
+    // Analiza una asignación como "a = 5"
+    private NodoExpresion AnalizarAsignacion()
+{
+    NodoExpresion izquierda = AnalizarComparacion();  // Puede ser una variable a la izquierda
+    if (_indice < _tokens.Length && _tokens[_indice] == "=")
+    {
+        _indice++;
+        NodoExpresion derecha = AnalizarExpresion();  // Se analiza una expresión a la derecha
+        NodoExpresion nodoAsignacion = new NodoExpresion("=");
+        nodoAsignacion.Izquierda = izquierda;
+        nodoAsignacion.Derecha = derecha;
+        return nodoAsignacion;
+    }
+    return izquierda;
+}
 
     // Analiza expresiones de comparación (>, <, >=, <=, ==, !=)
     private NodoExpresion AnalizarComparacion()
