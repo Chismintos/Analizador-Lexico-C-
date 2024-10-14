@@ -25,6 +25,12 @@ public class AnalizadorSintactico
 
     public NodoExpresion? Analizar()
 {
+    // Si comienza con 'while', analizamos la estructura del while
+    if (_indice < _tokens.Length && _tokens[_indice] == "while")
+    {
+        return AnalizarWhile();
+    }
+
     // Si comienza con 'if', analizamos la estructura condicional
     if (_indice < _tokens.Length && _tokens[_indice] == "if")
     {
@@ -41,8 +47,6 @@ public class AnalizadorSintactico
     return AnalizarExpresion();
 }
 
-
-    // Método para analizar una estructura de if-else
     // Método para analizar una estructura de if-else
 private NodoExpresion? AnalizarIfElse()
 {
@@ -82,7 +86,32 @@ private NodoExpresion? AnalizarIfElse()
     return null;
 }
 
+private NodoExpresion? AnalizarWhile()
+{
+    if (_indice < _tokens.Length && _tokens[_indice] == "while")
+    {
+        _indice++;  // Saltamos el 'while'
+        if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'while'.");
+        _indice++;
+        
+        NodoExpresion condicion = AnalizarExpresion(); // Condición del while
+        
+        if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')'.");
+        _indice++;  // Consumir el ')'
+        
+        NodoExpresion bloqueWhile = AnalizarBloque();  // Cuerpo del while
 
+        NodoExpresion nodoWhile = new NodoExpresion("while")
+        {
+            Izquierda = condicion,  // La condición del while
+            Derecha = bloqueWhile   // El bloque de instrucciones del while
+        };
+
+        return nodoWhile;
+    }
+    
+    return null;  // Si no es un 'while', regresamos null
+}
 
     // Método para analizar bloques de código, por ejemplo, el cuerpo de un if o else
 private NodoExpresion AnalizarBloque()
