@@ -29,6 +29,7 @@
         {
             Console.WriteLine("Árbol Sintáctico:");
             AnalizadorSintactico.ImprimirArbol(arbolSintactico);
+             
         }
         else
         {
