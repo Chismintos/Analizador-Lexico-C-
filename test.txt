@@ -1,4 +1,7 @@
-while (i < 5) {
-    x = x + i;
-
+if (x > 5) {
+    while (y < 10) {
+        x = x + 1;
+    }
+} else {
+    z = 40;
 }

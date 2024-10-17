@@ -127,8 +127,7 @@ public class AnalizadorSintactico
     }
     
 
-    // Método que analiza un bloque de código delimitado por llaves '{' y '}'
-    // Método que analiza un bloque de código delimitado por llaves '{' y '}'
+ // Método que analiza un bloque de código delimitado por llaves '{' y '}'
 private NodoExpresion AnalizarBloque()
 {
     if (_tokens[_indice] != "{") throw new Exception("Se esperaba '{'.");
@@ -172,6 +171,7 @@ private NodoExpresion AnalizarBloque()
 
     return instrucciones; // Devuelve el conjunto de instrucciones como un solo nodo
 }
+
 
 
    // Método que analiza expresiones generales
