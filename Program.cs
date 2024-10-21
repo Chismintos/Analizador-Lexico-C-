@@ -12,28 +12,45 @@
         // Tokenizar el contenido del archivo
         List<Token> listaTokens = lexer.Tokenizar();
 
-        // Convertir la lista de tokens a un arreglo de cadenas con solo los valores
-        string[] tokens = listaTokens.Select(token => token.Valor).ToArray();
+        // Preguntar al usuario qué acción desea realizar
+        Console.WriteLine("¿Qué deseas hacer?");
+        Console.WriteLine("1. Imprimir tabla de tokens");
+        Console.WriteLine("2. Generar árbol sintáctico");
+        Console.Write("Selecciona una opción (1 o 2): ");
+        string opcion = Console.ReadLine();
 
-        // Imprimir los tokens generados por el lexer
-        Console.WriteLine("Tokens: " + string.Join(", ", tokens));
-
-        // Crear una instancia del analizador sintáctico con los tokens generados
-        AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
-
-        // Intentar analizar los tokens
-        NodoExpresion? arbolSintactico = parser.Analizar();
-
-        // Si el análisis devuelve un árbol válido, imprimirlo
-        if (arbolSintactico != null)
+        // Verificar la opción ingresada por el usuario
+        if (opcion == "1")
         {
-            Console.WriteLine("Árbol Sintáctico:");
-            AnalizadorSintactico.ImprimirArbol(arbolSintactico);
-             
+            // Imprimir tabla de tokens
+            lexer.ImprimirTablaTokens(listaTokens);
+        }
+        else if (opcion == "2")
+        {
+            // Convertir la lista de tokens a un arreglo de cadenas con solo los valores
+            string[] tokens = listaTokens.Select(token => token.Valor).ToArray();
+
+            // Crear una instancia del analizador sintáctico con los tokens generados
+            AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
+
+            // Intentar analizar los tokens
+            NodoExpresion? arbolSintactico = parser.Analizar();
+
+            // Si el análisis devuelve un árbol válido, imprimirlo
+            if (arbolSintactico != null)
+            {
+                Console.WriteLine("Tokens: " + string.Join(", ", tokens));
+                Console.WriteLine("Árbol Sintáctico:");
+                AnalizadorSintactico.ImprimirArbol(arbolSintactico);
+            }
+            else
+            {
+                Console.WriteLine("No se pudo generar un árbol sintáctico válido.");
+            }
         }
         else
         {
-            Console.WriteLine("No se pudo generar un árbol sintáctico válido.");
+            Console.WriteLine("Opción no válida. Por favor selecciona 1 o 2.");
         }
     }
 }

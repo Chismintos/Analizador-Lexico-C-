@@ -35,6 +35,12 @@ public class AnalizadorSintactico
     // Método principal que analiza la entrada y devuelve el árbol de expresión correspondiente
     public NodoExpresion? Analizar()
     {
+
+        // Si el token actual es "for", se analiza como una expresión 'for'
+        if (_indice < _tokens.Length && _tokens[_indice] == "for")
+        {
+            return AnalizarFor();
+        }
         // Si el token actual es "while", se analiza como una expresión 'while'
         if (_indice < _tokens.Length && _tokens[_indice] == "while")
         {
@@ -126,6 +132,73 @@ public class AnalizadorSintactico
         return null; // Si no es un 'while', retorna null
     }
     
+private NodoExpresion? AnalizarFor()
+{
+    // Verifica si el token es "for"
+    if (_indice < _tokens.Length && _tokens[_indice] == "for")
+    {
+        Console.WriteLine("Se encontró un 'for'");
+        _indice++; // Avanza al siguiente token
+        if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'for'.");
+        _indice++; // Avanza al primer token dentro de los paréntesis
+
+        // Analizar la inicialización (por ejemplo: i = 0)
+        NodoExpresion inicializacion = AnalizarAsignacion();
+        if (_tokens[_indice] != ";") throw new Exception("Se esperaba ';' después de la inicialización en 'for'.");
+        _indice++; // Avanza al siguiente token
+
+        // Analizar la condición (por ejemplo: i < 10)
+        NodoExpresion condicion = AnalizarExpresion();
+        if (_tokens[_indice] != ";") throw new Exception("Se esperaba ';' después de la condición en 'for'.");
+        _indice++; // Avanza al siguiente token
+
+        // Analizar el incremento (por ejemplo: i++)
+        NodoExpresion incremento;
+        if (_tokens[_indice + 1] == "++")  // Verificar si es un incremento postfijo
+        {
+            incremento = new NodoExpresion("++")
+            {
+                Izquierda = new NodoExpresion(_tokens[_indice])
+            };
+            _indice += 2; // Avanzamos dos tokens (i y ++)
+        }
+        else
+        {
+            incremento = AnalizarExpresion(); // Si no es un incremento, se trata como una expresión normal
+        }
+
+        if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')' al final de la expresión 'for'.");
+        _indice++; // Avanza al siguiente token después del ')'
+
+        // Analiza el bloque de código dentro del 'for'
+        if (_tokens[_indice] != "{") throw new Exception("Se esperaba '{' después de la expresión 'for'.");
+        NodoExpresion bloqueFor = AnalizarBloque();  // Analizar el bloque dentro de '{}'
+
+        // Crea el nodo 'for' y asigna la inicialización, condición, incremento y el bloque
+        NodoExpresion nodoFor = new NodoExpresion("for")
+        {
+            Izquierda = new NodoExpresion("init")
+            {
+                Izquierda = inicializacion,
+                Derecha = new NodoExpresion("condicion")
+                {
+                    Izquierda = condicion,
+                    Derecha = new NodoExpresion("incremento")
+                    {
+                        Izquierda = incremento
+                    }
+                }
+            },
+            Derecha = bloqueFor  // Aquí se debe enlazar el bloque directamente
+        };
+
+        return nodoFor; // Devuelve el nodo 'for'
+    }
+
+    return null; // Si no es un 'for', retorna null
+}
+
+
 
  // Método que analiza un bloque de código delimitado por llaves '{' y '}'
 private NodoExpresion AnalizarBloque()
