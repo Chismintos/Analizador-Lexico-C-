@@ -138,9 +138,13 @@ private NodoExpresion? AnalizarIfElse()
         _indice++;
 
         // Incremento
-        NodoExpresion incremento = AnalizarIncremento(); 
+        NodoExpresion incremento = AnalizarIncremento();
         if (_tokens[_indice] != ")") throw new Exception("Se esperaba ')' al final de la expresión 'for'.");
         _indice++;
+
+        // Crear un nodo punto y coma que envuelva el incremento
+        NodoExpresion nodoIncremento = new NodoExpresion(";");
+        nodoIncremento.Izquierda = incremento;
 
         // Bloque de instrucciones
         NodoExpresion bloqueFor = AnalizarBloque();
@@ -154,7 +158,7 @@ private NodoExpresion? AnalizarIfElse()
                 Derecha = new NodoExpresion(";")
                 {
                     Izquierda = condicion,
-                    Derecha = incremento
+                    Derecha = nodoIncremento // El incremento es ahora un nodo hijo de `;`
                 }
             },
             Derecha = bloqueFor // El bloque de instrucciones va a la derecha
@@ -165,6 +169,7 @@ private NodoExpresion? AnalizarIfElse()
 
     return null;
 }
+
 
 
 // Nuevo método para manejar el incremento
