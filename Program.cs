@@ -42,6 +42,8 @@
                 Console.WriteLine("Tokens: " + string.Join(", ", tokens));
                 Console.WriteLine("Árbol Sintáctico:");
                 AnalizadorSintactico.ImprimirArbol(arbolSintactico);
+                Console.WriteLine("Árbol Sintáctico horizontal:");
+                AnalizadorSintactico.ImprimirArbolHorizontal(arbolSintactico);
             }
             else
             {

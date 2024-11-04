@@ -325,6 +325,11 @@ public class Lexer
     switch (actual)
     {
         case '+':
+        if (_posicion < _codigo.Length && _codigo[_posicion] == '+') // Verificar el siguiente carácter
+            {
+                _posicion++; // Avanzar para incluir el segundo '+'
+                return new Token("OP_INCREMENTO", "++"); // Token para el operador de incremento
+            }
             return new Token("OP_SUMA", valorSimbolo); // Operador de suma
         case '-':
             return new Token("OP_RESTA", valorSimbolo); // Operador de resta
