@@ -19,6 +19,7 @@ public class AnalizadorSintactico
 {
     private string[] _tokens;
     private int _indice;
+    private Dictionary<string, string> tablaSimbolos = new Dictionary<string, string>();
 
     public AnalizadorSintactico(string[] tokens)
     {
@@ -62,14 +63,66 @@ public NodoExpresion? Analizar()
 }
 
     private NodoExpresion AnalizarInstruccionCompleta()
+{
+    // Verificar si es una declaración de variable (tipo seguido de un identificador)
+    if (_indice + 1 < _tokens.Length && 
+        (_tokens[_indice] == "int" || _tokens[_indice] == "float" || _tokens[_indice] == "string") &&
+        EsIdentificador(_tokens[_indice + 1]))
     {
-        if (_indice < _tokens.Length && _tokens[_indice] == "for") return AnalizarFor();
-        if (_indice < _tokens.Length && _tokens[_indice] == "while") return AnalizarWhile();
-        if (_indice < _tokens.Length && _tokens[_indice] == "if") return AnalizarIfElse();
-        if (_indice < _tokens.Length && _tokens.Contains("=")) return AnalizarAsignacion();
-
-        return AnalizarExpresion();
+        return AnalizarDeclaracionVariable();
     }
+
+    // Analizar otras instrucciones como if, while, etc.
+    if (_indice < _tokens.Length && _tokens[_indice] == "for") return AnalizarFor();
+    if (_indice < _tokens.Length && _tokens[_indice] == "while") return AnalizarWhile();
+    if (_indice < _tokens.Length && _tokens[_indice] == "if") return AnalizarIfElse();
+    if (_indice < _tokens.Length && _tokens.Contains("=")) return AnalizarAsignacion();
+
+    return AnalizarExpresion();
+}
+private NodoExpresion AnalizarDeclaracionVariable()
+{
+    string tipo = _tokens[_indice];
+    _indice++;
+
+    if (_indice >= _tokens.Length || !EsIdentificador(_tokens[_indice]))
+        throw new Exception("Se esperaba un identificador después del tipo.");
+
+    string nombreVariable = _tokens[_indice];
+    _indice++;
+
+    // Guardar en la tabla de símbolos
+    if (!tablaSimbolos.ContainsKey(nombreVariable))
+    {
+        tablaSimbolos[nombreVariable] = tipo;
+    }
+    else
+    {
+        throw new Exception($"La variable '{nombreVariable}' ya fue declarada.");
+    }
+
+    // Si hay una asignación, analizarla
+    if (_indice < _tokens.Length && _tokens[_indice] == "=")
+    {
+        _indice++;
+        NodoExpresion expresion = AnalizarExpresion();
+        return new NodoExpresion("=")
+        {
+            Izquierda = new NodoExpresion(nombreVariable),
+            Derecha = expresion
+        };
+    }
+
+    // Retornar solo el nodo de la variable si no hay asignación
+    return new NodoExpresion(nombreVariable);
+}
+
+private bool EsIdentificador(string token)
+{
+    return char.IsLetter(token[0]) && token.All(c => char.IsLetterOrDigit(c) || c == '_');
+}
+
+
 private NodoExpresion? AnalizarIfElse()
 {
     if (_indice < _tokens.Length && _tokens[_indice] == "if")
@@ -127,8 +180,8 @@ private NodoExpresion? AnalizarIfElse()
         if (_tokens[_indice] != "(") throw new Exception("Se esperaba '(' después de 'for'.");
         _indice++;
 
-        // Inicialización
-        NodoExpresion inicializacion = AnalizarAsignacion();
+        // Inicialización (puede ser una asignación o una declaración)
+        NodoExpresion inicializacion = AnalizarDeclaracionOAsignacion();
         if (_tokens[_indice] != ";") throw new Exception("Se esperaba ';' después de la inicialización en 'for'.");
         _indice++;
 
@@ -166,6 +219,18 @@ private NodoExpresion? AnalizarIfElse()
     return null;
 }
 
+private NodoExpresion AnalizarDeclaracionOAsignacion()
+{
+    // Verificar si es una declaración de variable (tipo seguido de un identificador)
+    if (_indice + 1 < _tokens.Length && 
+        (_tokens[_indice] == "int" || _tokens[_indice] == "float" || _tokens[_indice] == "string") &&
+        EsIdentificador(_tokens[_indice + 1]))
+    {
+        return AnalizarDeclaracionVariable();  // Analiza la declaración de la variable
+    }
+    // Si no es una declaración, tratar como asignación
+    return AnalizarAsignacion();
+}
 
 
 
@@ -253,16 +318,31 @@ private NodoExpresion? AnalizarIncremento()
     }
 
     private NodoExpresion AnalizarAsignacion()
+{
+    if (_indice >= _tokens.Length || !EsIdentificador(_tokens[_indice]))
+        throw new Exception("Se esperaba un identificador para la asignación.");
+
+    string nombreVariable = _tokens[_indice];
+    _indice++;
+
+    // Verificar que la variable esté declarada
+    if (!tablaSimbolos.ContainsKey(nombreVariable))
+        throw new Exception($"La variable '{nombreVariable}' no ha sido declarada.");
+
+    if (_indice < _tokens.Length && _tokens[_indice] == "=")
     {
-        NodoExpresion izquierda = AnalizarComparacion();
-        if (_indice < _tokens.Length && _tokens[_indice] == "=")
+        _indice++;
+        NodoExpresion derecha = AnalizarExpresion();
+        return new NodoExpresion("=")
         {
-            _indice++;
-            NodoExpresion derecha = AnalizarExpresion();
-            return new NodoExpresion("=") { Izquierda = izquierda, Derecha = derecha };
-        }
-        return izquierda;
+            Izquierda = new NodoExpresion(nombreVariable),
+            Derecha = derecha
+        };
     }
+
+    throw new Exception("Se esperaba '=' en la asignación.");
+}
+
 
     private NodoExpresion AnalizarComparacion()
     {
@@ -377,6 +457,15 @@ private NodoExpresion? AnalizarIncremento()
 
     // Luego imprime el subárbol izquierdo
     ImprimirArbolHorizontal(nodo.Izquierda, nivel + 1);
+}
+
+public void ImprimirTablaSimbolos()
+{
+    Console.WriteLine("Tabla de Símbolos:");
+    foreach (var entrada in tablaSimbolos)
+    {
+        Console.WriteLine($"Variable: {entrada.Key}, Tipo: {entrada.Value}");
+    }
 }
 
 }

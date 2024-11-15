@@ -20,13 +20,11 @@
         string opcion = Console.ReadLine();
 
         // Verificar la opción ingresada por el usuario
-        if (opcion == "1")
-        {
+        if (opcion == "1"){
             // Imprimir tabla de tokens
             lexer.ImprimirTablaTokens(listaTokens);
         }
-        else if (opcion == "2")
-        {
+        else if (opcion == "2"){
             // Convertir la lista de tokens a un arreglo de cadenas con solo los valores
             string[] tokens = listaTokens.Select(token => token.Valor).ToArray();
 
@@ -44,6 +42,8 @@
                 AnalizadorSintactico.ImprimirArbol(arbolSintactico);
                 Console.WriteLine("Árbol Sintáctico horizontal:");
                 AnalizadorSintactico.ImprimirArbolHorizontal(arbolSintactico);
+                // parser.ImprimirTablaSimbolos();
+                
             }
             else
             {

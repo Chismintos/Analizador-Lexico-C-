@@ -405,7 +405,6 @@ public class Lexer
     }
 }
 
-
     // Mira el siguiente carácter sin avanzar la posición
     private char Peek()
     {
