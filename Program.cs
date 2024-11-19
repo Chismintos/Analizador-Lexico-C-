@@ -75,10 +75,11 @@
                 // Generar el código intermedio a partir del árbol sintáctico
                 generador.GenerarCodigoIntermedio(arbolSintactico);
 
-                // Imprimir los cuádruplos generados
-                Console.WriteLine("Código Intermedio (Cuádruplos) No Optimizado:");
-
+                // Imprimir 
+                Console.WriteLine("Código Intermedio No Optimizado:");
                 generador.ImprimirCuadruplosEnTabla();
+                Console.WriteLine("Código Intermedio Final:");
+                generador.ImprimirCodigoIntermedio();
             }
             else
             {

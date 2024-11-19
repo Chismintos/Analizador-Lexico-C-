@@ -372,13 +372,33 @@ private NodoExpresion? AnalizarIncremento()
 
     private NodoExpresion AnalizarTermino()
     {
-        NodoExpresion izquierda = AnalizarFactor();
+        NodoExpresion izquierda = AnalizarPotencia();
         while (_indice < _tokens.Length && (_tokens[_indice] == "*" || _tokens[_indice] == "/"))
         {
             string operador = _tokens[_indice];
             _indice++;
-            NodoExpresion derecha = AnalizarFactor();
+            NodoExpresion derecha = AnalizarPotencia();
             izquierda = new NodoExpresion(operador) { Izquierda = izquierda, Derecha = derecha };
+        }
+        return izquierda;
+    }
+
+
+// Método que analiza operaciones de potencia (^)
+    private NodoExpresion AnalizarPotencia()
+    {
+        NodoExpresion izquierda = AnalizarFactor(); // Inicia con un factor
+        while (_indice < _tokens.Length && _tokens[_indice] == "^")
+        {
+            string operador = _tokens[_indice];
+            _indice++;
+            NodoExpresion derecha = AnalizarFactor(); // Procesa el exponente
+            NodoExpresion nodoPotencia = new NodoExpresion(operador)
+            {
+                Izquierda = izquierda,
+                Derecha = derecha
+            };
+            izquierda = nodoPotencia; // Actualiza el nodo base
         }
         return izquierda;
     }

@@ -86,6 +86,29 @@ public class GeneradorCodigoIntermedio
         return temporalOp;
     }
 
+public void ImprimirCodigoIntermedio()
+{
+
+    foreach (var cuadruplo in cuadruplos)
+    {
+        string operador = cuadruplo.Operador == "=" ? "" : cuadruplo.Operador;
+        string operando1 = cuadruplo.Operando1 ?? "";
+        string operando2 = cuadruplo.Operando2 ?? "";
+        string resultado = cuadruplo.Resultado;
+
+        if (operador == "")
+        {
+            // Caso asignación simple
+            Console.WriteLine($"{resultado} = {operando1};");
+        }
+        else
+        {
+            // Caso operación con operador
+            Console.WriteLine($"{resultado} = {operando1} {operador} {operando2};");
+        }
+    }
+}
+
     // Método para imprimir los cuádruplos como tabla
     public void ImprimirCuadruplosEnTabla()
 {
