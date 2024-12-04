@@ -3,3 +3,19 @@ int b = 3;
 int c = 4;
 int d = (a + b) * (c - b) + (a * c);
 int e = d ^ (a + c) - b * 2;
+
+int x = 5;
+int y = 10;
+
+if (x < y) {
+    x = x + 1;
+} else {
+    y = y - 1;
+}
+
+int n = 4;
+
+while (n < 10)
+{
+    n = n + 1;
+}
